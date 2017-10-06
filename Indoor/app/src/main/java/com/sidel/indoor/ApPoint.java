@@ -19,6 +19,9 @@ public class ApPoint extends View {
     private Paint paint;
     private float radius;
 
+
+    private Fingerprint fingerprint;
+
     public ApPoint(Context context) {
         super(context);
         active = false;
@@ -65,5 +68,14 @@ public class ApPoint extends View {
 
     public void setLocation(PointF location) {
         this.location = location;
+    }
+
+
+    public Fingerprint getFingerprint() {
+        return fingerprint;
+    }
+
+    public void setFingerprint(Fingerprint fingerprint) {
+        this.fingerprint = fingerprint;
     }
 }

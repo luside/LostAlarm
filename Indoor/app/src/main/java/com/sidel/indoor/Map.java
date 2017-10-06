@@ -30,4 +30,28 @@ public class Map extends ImageView {
 
 
     }
+
+    public ApPoint createNewWifiPointOnMap(PointF location) {
+        ApPoint apPoint = new ApPoint(getContext());
+        apPoint.setLocation(location);
+        apPoints.add(apPoint);
+        return apPoint;
+    }
+
+    public ApPoint createNewWifiPointOnMap(Fingerprint fingerprint, boolean visible) {
+        ApPoint ap = createNewWifiPointOnMap(fingerprint);
+        ap.setVisible(visible);
+        return ap;
+    }
+
+    public ApPoint createNewWifiPointOnMap(Fingerprint fingerprint) {
+        ApPoint ap = new ApPoint(getContext());
+        ap.setFingerprint(fingerprint);
+        apPoints.add(ap);
+        return ap;
+    }
+
+    public void setWifiPointViewPosition(ApPoint ap, PointF location) {
+        ap.setLocation(location);
+    }
 }
