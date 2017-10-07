@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PointF;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -45,7 +46,9 @@ public class ApPoint extends View {
             } else {
                 this.paint.setColor(Color.RED);
             }
-        }canvas.drawCircle(this.location.x, this.location.y, this.radius, this.paint);
+        }
+        Log.d("TAG",this.location.toString());
+        canvas.drawCircle(this.location.x, this.location.y, this.radius, this.paint);
     }
 
     public boolean isActive() {
@@ -79,5 +82,6 @@ public class ApPoint extends View {
 
     public void setFingerprint(Fingerprint fingerprint) {
         this.fingerprint = fingerprint;
+        this.location = fingerprint.getLocation();
     }
 }

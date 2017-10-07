@@ -35,13 +35,14 @@ public class MainActivity extends Activity implements View.OnTouchListener {
     public static final int SCAN_DELAY = 1000; // delay for the first scan (milliseconds)
     public static final int SCAN_INTERVAL = 1000; // interval between scans (milliseconds)
 
-    private class Redraw implements Runnable {
+    protected class Redraw implements Runnable {
         public void run() {
             refresh();
         }
     }
 
-    private Redraw redraw;
+    protected Redraw redraw;
+
     private HashMap<String, Integer> dict;
 
     @Override
@@ -79,6 +80,8 @@ public class MainActivity extends Activity implements View.OnTouchListener {
         registerReceiver(broadcastReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
     }
 
+
+
     protected void receiveScanResults(final List<ScanResult> results) {
         Indoor application = (Indoor) getApplication();
         final ArrayList<Fingerprint> fingerprints = application.getFingerprintData();
@@ -113,9 +116,9 @@ public class MainActivity extends Activity implements View.OnTouchListener {
                     Fingerprint f = new Fingerprint(newdict);
 
                     Fingerprint closestMatch = f.getClosestMatch(fingerprints);
+                    //Log.d("TAG",closestMatch.getLocation().toString());
                     user.setFingerprint(closestMatch);
 
-                    // need to refresh map through updateHandler since only UI thread is allowed to touch its views
                     updatehandler.post(redraw);
                 }
             };

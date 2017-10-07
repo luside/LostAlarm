@@ -55,6 +55,7 @@ public class EditActivity extends Activity implements View.OnTouchListener {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         map = (Map) findViewById(R.id.map);
         map.setOnTouchListener(this);
+
     }
 
     public boolean onTouch(View view, MotionEvent event) {

@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class Map extends ImageView {
         int h = this.getHeight();
         Bitmap resizeBmp = Bitmap.createScaledBitmap(this.bitmap, w, h, true);
         canvas.drawBitmap(resizeBmp, 0, 0, null);
+        Log.d("TAG","onDraw");
         for (ApPoint point : this.apPoints) {
             point.drawApPoints(canvas);
         }
