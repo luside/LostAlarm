@@ -31,6 +31,7 @@ public class ApPoint extends View {
         paint.setColor(Color.RED);
         paint.setTextSize(25);
         paint.setAntiAlias(true);
+        radius = 10f;
     }
 
     protected void onDraw(Canvas canvas) {
@@ -39,11 +40,12 @@ public class ApPoint extends View {
 
     protected void drawApPoints(Canvas canvas) {
         if (this.visible) {
-            this.paint.setColor(Color.GREEN);
-        } else {
-            this.paint.setColor(Color.RED);
-        }
-        canvas.drawCircle(this.location.x, this.location.y, this.radius, this.paint);
+            if (this.active) {
+                this.paint.setColor(Color.GREEN);
+            } else {
+                this.paint.setColor(Color.RED);
+            }
+        }canvas.drawCircle(this.location.x, this.location.y, this.radius, this.paint);
     }
 
     public boolean isActive() {

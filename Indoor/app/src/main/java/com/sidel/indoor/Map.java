@@ -27,6 +27,14 @@ public class Map extends ImageView {
     }
 
     protected void onDraw(Canvas canvas){
+        super.onDraw(canvas);
+        int w = this.getWidth();
+        int h = this.getHeight();
+        Bitmap resizeBmp = Bitmap.createScaledBitmap(this.bitmap, w, h, true);
+        canvas.drawBitmap(resizeBmp, 0, 0, null);
+        for (ApPoint point : this.apPoints) {
+            point.drawApPoints(canvas);
+        }
 
 
     }

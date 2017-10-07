@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.PointF;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -51,6 +52,8 @@ public class MainActivity extends Activity implements View.OnTouchListener {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         map = (Map) findViewById(R.id.map);
         map.setOnTouchListener(this);
+        user = map.createNewWifiPointOnMap(new PointF(0,0));
+        user.setActive(true);
         dict = new HashMap<String, Integer>();
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {

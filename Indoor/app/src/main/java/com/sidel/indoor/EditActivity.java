@@ -30,7 +30,7 @@ import java.util.TreeSet;
 
 public class EditActivity extends Activity implements View.OnTouchListener {
 
-    public static final int SCAN_DELAY = 1000;
+
     public static final int SCAN_INTERVAL = 1000;
 
     protected Map map;
@@ -44,7 +44,6 @@ public class EditActivity extends Activity implements View.OnTouchListener {
 
     private HashMap<String, Integer> dict;
 
-    private boolean visible = true;
 
     private long touchStarted;
 
@@ -62,7 +61,7 @@ public class EditActivity extends Activity implements View.OnTouchListener {
         view.onTouchEvent(event);
         switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_DOWN:
-                touchStarted = event.getEventTime(); // calculate tap start
+                touchStarted = event.getEventTime();
                 break;
             case MotionEvent.ACTION_UP:
                 if (event.getEventTime() - touchStarted < 200) {
@@ -86,7 +85,7 @@ public class EditActivity extends Activity implements View.OnTouchListener {
         broadcastReceiver = new BroadcastReceiver ()
         {
             @Override
-            public void onReceive(Context c, Intent intent)
+            public void onReceive(Context context, Intent intent)
             {
                 onReceiveWifiScanResults(wifiManager.getScanResults());
 
@@ -104,6 +103,7 @@ public class EditActivity extends Activity implements View.OnTouchListener {
 
     public void onReceiveWifiScanResults(List<ScanResult> results) {
         Log.d("TAG","OnReceive");
+        Log.d("TAG",String.valueOf(remainingScan));
         if (remainingScan != 0 && ap != null) {
             remainingScan--;
             HashMap<String, Integer> newdict = new HashMap<String, Integer>();
@@ -113,7 +113,7 @@ public class EditActivity extends Activity implements View.OnTouchListener {
 
             TreeSet<String> keys = new TreeSet<String>();
             keys.addAll(dict.keySet());
-            keys.addAll(dict.keySet());
+            keys.addAll(newdict.keySet());
 
             for (String key : keys) {
                 Integer value = dict.get(key);
@@ -138,9 +138,11 @@ public class EditActivity extends Activity implements View.OnTouchListener {
                 f.setLocation(ap.getLocation());
                 map.createNewWifiPointOnMap(f, true);
                 application.addFingerprint(f);
+                progressDialog.dismiss();
             }
 
         } else {
+            progressDialog.dismiss();
             Toast.makeText(getApplicationContext(), "Failed to create fingerprint", Toast.LENGTH_SHORT).show();
         }
     }
@@ -172,7 +174,9 @@ public class EditActivity extends Activity implements View.OnTouchListener {
     public void startScan() {
         remainingScan = 3;
         dict = new HashMap<String, Integer>();
+        Log.d("TAG","Start to SCAN!!!!!!!!!!!!");
         progressDialog = ProgressDialog.show(this,"","Scanning...Please Wait",true);
+        Log.d("TAG","Scanning!!!!!!!!!!!!!!!!!!");
         wifiManager.startScan();
     }
 
