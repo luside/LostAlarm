@@ -18,11 +18,19 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
+
+import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+
+import static com.microsoft.windowsazure.mobileservices.table.query.QueryOperations.val;
 
 /**
  * Created by lsd20 on 06/10/2017.
@@ -47,6 +55,10 @@ public class EditActivity extends Activity implements View.OnTouchListener {
 
     private long touchStarted;
 
+    //Azure
+    private MobileServiceClient mClient;
+    private MobileServiceTable<coordinatesRSSI> mCoordinatesRSSITable;
+
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTitle("EDIT MODE");
@@ -56,7 +68,36 @@ public class EditActivity extends Activity implements View.OnTouchListener {
         map = (Map) findViewById(R.id.map);
         map.setOnTouchListener(this);
 
+        //Azure
+        try {
+            mClient = new MobileServiceClient(
+                    "http://lostalarm.azurewebsites.net/",
+                    this);
+            mCoordinatesRSSITable = mClient.getTable(coordinatesRSSI.class);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
     }
+
+    //Azure synchrosing added
+    public coordinatesRSSI addItemInTable(coordinatesRSSI item) throws ExecutionException, InterruptedException {
+        coordinatesRSSI entity = mCoordinatesRSSITable.insert(item).get();
+        return entity;
+    }
+
+    public void checkItemInTable(coordinatesRSSI item) throws ExecutionException, InterruptedException {
+        mCoordinatesRSSITable.update(item).get();
+    }
+
+    private List<coordinatesRSSI> refreshItemsFromMobileServiceTable() throws ExecutionException, InterruptedException {
+        return mCoordinatesRSSITable.where().field("complete").
+                eq(val(false)).execute().get();
+    }
+
+
+
+    //Azure adding ends
 
     public boolean onTouch(View view, MotionEvent event) {
         view.onTouchEvent(event);
@@ -151,6 +192,8 @@ public class EditActivity extends Activity implements View.OnTouchListener {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(1, 1, 0, "SCAN");
         menu.add(1, 2, 1, "EXIT EDIT MODE");
+        menu.add(1, 3, 2, "UPDATE FINGERPRINTS SET TO AZURE");
+        menu.add(1, 4, 3, "GET FINGERPRINTS SET FROM AZURE");
         return true;
     }
 
@@ -169,6 +212,47 @@ public class EditActivity extends Activity implements View.OnTouchListener {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+
+            case 3:
+                ArrayList<Fingerprint> results = application.getFingerprintData();
+                for(Fingerprint result : results){
+                    coordinatesRSSI addingItem = new coordinatesRSSI(result.getLocation().x,result.getLocation().y,result.getDict().toString());
+                    try {
+                        addItemInTable(addingItem);
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return true;
+            case 4:
+                ArrayList<coordinatesRSSI> tempRsults  = null;
+                try {
+                    tempRsults = (ArrayList<coordinatesRSSI>) refreshItemsFromMobileServiceTable();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                ArrayList<Fingerprint> newRsults = new ArrayList<Fingerprint>();
+                for(coordinatesRSSI tempRestult:tempRsults){
+                    String dirtyResult = tempRestult.getHashString();
+                    String pureResult = dirtyResult.substring(1,dirtyResult.length()-1);
+                    HashMap<String, Integer> dict = new HashMap<String, Integer>();
+                    for(String idLevel : pureResult.split(", ")){
+                        String id = idLevel.split("=")[0];
+                        String level = idLevel.split("=")[1];
+                        dict.put(id, Integer.valueOf(level));
+                    }
+                    PointF location = new PointF();
+                    location.set(tempRestult.getxCoordinates(),tempRestult.getyCoordinates());
+                    Fingerprint fingerprint = new Fingerprint(tempRestult.getId(),location, dict);
+                    newRsults.add(fingerprint);
+                }
+                application.setFingerprintData(newRsults);
+                return true;
+
         }
     }
 

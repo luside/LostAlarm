@@ -31,6 +31,9 @@ public class Indoor extends Application {
     public ArrayList<Fingerprint> getFingerprintData() {
         return fingerprints;
     }
+    public void setFingerprintData(ArrayList<Fingerprint> results) {
+        fingerprints = results;
+    }
 
 
     public void addFingerprint(Fingerprint fingerprint) {
